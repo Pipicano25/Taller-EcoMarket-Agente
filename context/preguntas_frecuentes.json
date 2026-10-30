@@ -1,0 +1,57 @@
+[
+  {
+    "id": "FAQ-001",
+    "categoria": "Envíos y Entregas",
+    "pregunta": "¿Cuáles son los tiempos y costos de envío en EcoMarket?",
+    "respuesta": "El tiempo estimado de entrega es de 2 a 4 días hábiles en ciudades principales de Colombia (Bogotá, Medellín, Cali, Barranquilla y Bucaramanga) y de 4 a 7 días hábiles en el resto del país. El costo de envío estándar es de $12.000 COP, y el envío es totalmente GRATIS en compras iguales o superiores a $120.000 COP. Trabajamos con las transportadoras Servientrega, Coordinadora e Interrapidísimo."
+  },
+  {
+    "id": "FAQ-002",
+    "categoria": "Envíos y Entregas",
+    "pregunta": "¿Por qué mi pedido aparece en estado 'Preparando envío' y sin enlace de seguimiento?",
+    "respuesta": "Cuando un pedido figura como 'Preparando envío' con transportadora 'Pendiente de asignación', significa que nuestro equipo de bodega está alistando y empacando tus productos con materiales biodegradables. Tan pronto la transportadora recoja el paquete (usualmente dentro de las primeras 24 a 36 horas hábiles tras la compra), se asignará la empresa transportadora y se activará el enlace de seguimiento."
+  },
+  {
+    "id": "FAQ-003",
+    "categoria": "Envíos y Entregas",
+    "pregunta": "¿Qué pasa si mi pedido está en estado 'Retrasado'?",
+    "respuesta": "Si tu pedido presenta el estado 'Retrasado', se debe a una novedad operativa o logística reportada por la transportadora asignada. En el registro de tu pedido podrás consultar la nueva fecha estimada de entrega y el motivo específico. Si la fecha estimada ya venció o necesitas asistencia prioritaria, puedes solicitar que escalemos tu caso a un agente humano."
+  },
+  {
+    "id": "FAQ-004",
+    "categoria": "Medios de Pago y Facturación",
+    "pregunta": "¿Qué medios de pago acepta EcoMarket?",
+    "respuesta": "Aceptamos pagos en línea a través de PSE (cuentas de ahorro y corriente de todos los bancos en Colombia), tarjetas de crédito y débito (Visa, Mastercard, American Express), billeteras digitales (Nequi y Daviplata) y pago contra entrega en efectivo únicamente en Bogotá, Medellín y Cali."
+  },
+  {
+    "id": "FAQ-005",
+    "categoria": "Medios de Pago y Facturación",
+    "pregunta": "¿En cuánto tiempo se realiza el reembolso de dinero tras aprobarse una devolución?",
+    "respuesta": "Una vez recibimos el producto devuelto en nuestra bodega y verificamos que cumple las condiciones de la Política de Devoluciones (sin usar y en su empaque original), procesamos el reembolso en un plazo de 3 a 5 días hábiles si pagaste por PSE, Nequi o Daviplata, o un bono inmediato redimible en EcoMarket. Para pagos con tarjeta de crédito, la reversión bancaria puede tardar entre 10 y 15 días hábiles según la entidad financiera emisora."
+  },
+  {
+    "id": "FAQ-006",
+    "categoria": "Devoluciones y Garantías",
+    "pregunta": "¿Qué productos son considerados de higiene personal y cuál es su regla de devolución?",
+    "respuesta": "En el catálogo de EcoMarket, productos como el Cepillo dental de bambú (PROD-002), el Shampoo sólido natural (PROD-005), el Jabón artesanal biodegradable (PROD-007) y el Protector solar ecológico (PROD-009) pertenecen a la categoría de Higiene y Cuidado Personal. Por normativa sanitaria, NO pueden devolverse una vez abierto su empaque o sello de seguridad. Solo admiten devolución dentro de los 30 días posteriores a la entrega si se encuentran completamente sellados y sin abrir."
+  },
+  {
+    "id": "FAQ-007",
+    "categoria": "Devoluciones y Garantías",
+    "pregunta": "¿Qué debo hacer si mi producto llegó defectuoso, roto o dañado durante el transporte?",
+    "respuesta": "Si recibiste un producto defectuoso de fábrica o dañado durante el transporte, EcoBot no aprueba ni rechaza directamente el caso: tu solicitud será escalada de inmediato a un agente humano especializado para validar el cambio, reposición sin costo o devolución total del dinero. Ten a la mano tu número de pedido (ej. ECO-10001) y fotografías del estado del producto."
+  },
+  {
+    "id": "FAQ-008",
+    "categoria": "Atención al Cliente y Escalamiento",
+    "pregunta": "¿Cuál es el horario de atención de los agentes humanos de EcoMarket y qué solicitudes no puede realizar EcoBot?",
+    "respuesta": "EcoBot atiende consultas informativas 24/7. Nuestro equipo de agentes humanos atiende casos escalados (productos defectuosos, daños en transporte, modificaciones de dirección de envío en curso, facturación electrónica corporativa o reclamos complejos) de lunes a viernes de 8:00 a.m. a 6:00 p.m. y sábados de 9:00 a.m. a 1:00 p.m. EcoBot no tiene herramientas para cancelar pedidos directamente en base de datos, procesar cobros ni cambiar direcciones de entrega sin intervención humana."
+  },
+  {
+    "id": "FAQ-009",
+    "categoria": "Sostenibilidad y Programa EcoPuntos",
+    "pregunta": "¿Cómo funciona el programa de envases retornables y EcoPuntos?",
+    "respuesta": "Por cada compra en EcoMarket acumulas 1 EcoPunto por cada $1.000 COP. Además, si devuelves envases vacíos limpios de productos seleccionados (como el envase de aluminio del Protector solar ecológico o la garrafa del Detergente ecológico en recarga 2L) en nuestros puntos aliados, recibes un bono de $5.000 COP de descuento para tu próxima compra sostenible."
+  }
+]
+

@@ -1,0 +1,91 @@
+BASE DE DATOS DE PEDIDOS DE PRUEBA - ECOMARKET
+
+PEDIDO 1
+Número de seguimiento: ECO-10001
+Producto: Botella reutilizable EcoBottle 750 ml
+Estado: En tránsito
+Fecha estimada de entrega: 25/09/2026
+Transportadora: Servientrega
+Enlace de seguimiento: https://tracking.ecomarket.test/ECO-10001
+
+PEDIDO 2
+Número de seguimiento: ECO-10002
+Producto: Cepillo dental de bambú
+Estado: Entregado
+Fecha de entrega: 20/09/2026
+Transportadora: Coordinadora
+Enlace de seguimiento: https://tracking.ecomarket.test/ECO-10002
+
+PEDIDO 3
+Número de seguimiento: ECO-10003
+Producto: Bolsa reutilizable de algodón
+Estado: Preparando envío
+Fecha estimada de entrega: 27/09/2026
+Transportadora: Pendiente de asignación
+Enlace de seguimiento: No disponible
+
+PEDIDO 4
+Número de seguimiento: ECO-10004
+Producto: Kit de cubiertos reutilizables
+Estado: Retrasado
+Fecha estimada de entrega: 28/09/2026
+Motivo: Retraso logístico de la transportadora
+Transportadora: Servientrega
+Enlace de seguimiento: https://tracking.ecomarket.test/ECO-10004
+
+PEDIDO 5
+Número de seguimiento: ECO-10005
+Producto: Shampoo sólido natural
+Estado: En tránsito
+Fecha estimada de entrega: 24/09/2026
+Transportadora: Interrapidísimo
+Enlace de seguimiento: https://tracking.ecomarket.test/ECO-10005
+
+PEDIDO 6
+Número de seguimiento: ECO-10006
+Producto: Termo reutilizable de acero inoxidable
+Estado: Entregado
+Fecha de entrega: 19/09/2026
+Transportadora: Servientrega
+Enlace de seguimiento: https://tracking.ecomarket.test/ECO-10006
+
+PEDIDO 7
+Número de seguimiento: ECO-10007
+Producto: Jabón artesanal biodegradable
+Estado: Preparando envío
+Fecha estimada de entrega: 29/09/2026
+Transportadora: Pendiente de asignación
+Enlace de seguimiento: No disponible
+
+PEDIDO 8
+Número de seguimiento: ECO-10008
+Producto: Set de bolsas para alimentos reutilizables
+Estado: En tránsito
+Fecha estimada de entrega: 26/09/2026
+Transportadora: Coordinadora
+Enlace de seguimiento: https://tracking.ecomarket.test/ECO-10008
+
+PEDIDO 9
+Número de seguimiento: ECO-10009
+Producto: Protector solar ecológico
+Estado: Retrasado
+Fecha estimada de entrega: 30/09/2026
+Motivo: Novedad operativa en centro de distribución
+Transportadora: Interrapidísimo
+Enlace de seguimiento: https://tracking.ecomarket.test/ECO-10009
+
+PEDIDO 10
+Número de seguimiento: ECO-10010
+Producto: Cuaderno de papel reciclado
+Estado: En tránsito
+Fecha estimada de entrega: 25/09/2026
+Transportadora: Servientrega
+Enlace de seguimiento: https://tracking.ecomarket.test/ECO-10010
+
+PEDIDO 11
+Número de seguimiento: ECO-10011
+Producto: Cuaderno de papel reciclado
+Estado: Entregado
+Fecha de entrega: 19/09/2026
+Transportadora: Servientrega
+Enlace de seguimiento: https://tracking.ecomarket.test/ECO-10011

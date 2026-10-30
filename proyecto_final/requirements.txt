@@ -1,0 +1,30 @@
+# Dependencias del Proyecto Final - EcoMarket
+
+# Procesamiento de documentos
+pymupdf>=1.24
+
+# Embeddings y Base Vectorial
+sentence-transformers>=3.0
+langchain-huggingface>=0.1
+langchain-core>=0.3
+langchain-text-splitters>=0.3
+langchain-chroma>=0.2
+chromadb>=0.5
+
+# Orquestación del Agente
+langgraph>=0.2
+ollama>=0.4
+
+# Protocolo MCP (Model Context Protocol)
+mcp>=1.1.0
+fastmcp>=0.1.0
+langchain-mcp-adapters>=0.1.0
+
+# Configuración, Base de Datos y Datos
+python-dotenv>=1.0
+requests>=2.32
+pandas>=2.0
+
+# Interfaz Web (Fase 4)
+streamlit>=1.38.0
+

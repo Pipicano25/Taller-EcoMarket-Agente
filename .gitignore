@@ -1,0 +1,11 @@
+.env
+chroma_db/
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+*.log
+.venv/
+env/
+venv/
+cloudflared*
+Consigna/
