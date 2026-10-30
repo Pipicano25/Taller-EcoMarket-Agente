@@ -536,6 +536,20 @@ Durante las pruebas funcionales en la aplicación web desplegada en Cloudflare T
    - **Caso 3 (ECO-10006 - Termo Sellado):** Emite radicado `RET-2026-XXXX`, guía de transporte `GUIA-REV-XXXX99`, inserta exitosamente en `devoluciones` y la barra lateral de Streamlit muestra de inmediato la radicación activa.
    - **Caso 4 (ECO-10002 - Cepillo Dental Abierto):** El guardrail interno y del agente bloquea formalmente la generación con código `BLOQUEO_SANITARIO` / `EXCEPCION_SANITARIA_SELLO_ROTO`, impidiendo cualquier inserción en la base de datos y manteniendo la integridad normativa.
 
+### 8. Memoria Conversacional Multi-Turno y Gestión del Ciclo de Vida de la Interacción
+
+Para garantizar que el agente no opere de forma aislada (*stateless*) entre mensajes consecutivos, se evolucionó la arquitectura de LangGraph y la interfaz de usuario para dar soporte completo a **conversaciones guiadas multi-turno** y **control explícito del ciclo de vida de la sesión**:
+
+#### 8.1. Evolución de la Arquitectura de Memoria en LangGraph:
+1. **Extensión del Estado del Agente (`AgentState`):** Se incorporó la clave `historial: list[dict]`, preservando los turnos previos con sus respectivos roles (`user` y `assistant`).
+2. **Planificador Consciente del Contexto:** El nodo `planificador` evalúa tanto la última consulta como los turnos conversacionales previos. Esto permite resolver anáforas y elipsis: cuando el cliente indica en un primer turno *"Quiero devolver un producto"* y el bot solicita el número de pedido y estado del empaque, en el segundo turno el cliente puede limitarse a responder *"Es el ECO-10006 y está sellado"*. El planificador integra el historial y ejecuta deterministamente `verificar_elegibilidad_producto` sin reiniciar el diálogo ni olvidar la intención de devolución.
+3. **Coherencia Natural en el Nodo Responder:** El nodo generador recibe el historial conversacional formateado junto con la evidencia técnica de las herramientas MCP, logrando respuestas continuas, empáticas y fluidas.
+
+#### 8.2. Controles de Sesión en la Interfaz Web (Streamlit):
+En la barra lateral se incorporó un panel dedicado de **Control de Interacción**:
+* **🟢 Iniciar Interacción:** Restablece el estado de la sesión, limpia el historial conversacional y presenta el saludo institucional de apertura de EcoBot, dejando el sistema listo para una consulta fresca.
+* **🛑 Finalizar Interacción:** Concluye formalmente la atención emitiendo el mensaje de cierre con protocolo corporativo (*recordatorio de guías firmadas y conservación de radicados*), deshabilitando temporalmente el campo de entrada hasta que el cliente decida pulsar de nuevo *Iniciar*.
+
 ---
 
 ## Próximos Pasos (Transición hacia la Fase 3)

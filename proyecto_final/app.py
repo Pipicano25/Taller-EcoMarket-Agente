@@ -1,7 +1,7 @@
 """
 app.py
 Aplicación Web de EcoMarket en Streamlit para Atención al Cliente y Automatización de Devoluciones.
-Integra LangGraph + MCP Servers (Datos, Devoluciones, Conocimiento RAG) + SQLite + Ollama Cloud.
+Integra LangGraph con Memoria Multi-Turno + Servidores FastMCP + SQLite + ChromaDB + Ollama Cloud.
 """
 
 import os
@@ -10,6 +10,7 @@ import json
 import sqlite3
 import time
 from pathlib import Path
+from typing import TypedDict
 import streamlit as st
 from dotenv import load_dotenv
 
@@ -43,20 +44,26 @@ HERRAMIENTAS = {
 
 def get_db_path():
     base = Path(__file__).resolve().parent
-    for p in [base / "ecomarket.db", Path.cwd() / "ecomarket.db", Path("/content/ecomarket.db")]:
+    for p in [
+        base / "ecomarket.db",
+        Path.cwd() / "ecomarket.db",
+        Path("/content/ecomarket.db"),
+        Path("/content/Taller-EcoMarket-Agente/proyecto_final/ecomarket.db"),
+        Path.cwd() / "proyecto_final" / "ecomarket.db"
+    ]:
         if p.is_file(): return p
     return base / "ecomarket.db"
 
 
 # ============================================================================
-# AGENTE LANGGRAPH (ORQUESTADOR)
+# AGENTE LANGGRAPH (ORQUESTADOR CON MEMORIA MULTI-TURNO)
 # ============================================================================
 from ollama import Client
-from typing import TypedDict
 from langgraph.graph import StateGraph, START, END
 
 class AgentState(TypedDict, total=False):
     consulta: str
+    historial: list[dict]
     plan: list[dict]
     evidencia: list[dict]
     respuesta: str
@@ -66,11 +73,12 @@ Cuentas con herramientas MCP para consultar pedidos, catálogo, validar polític
 
 REGLAS CRÍTICAS DE CONDUCTA:
 1. Responde siempre en español, de forma cálida, empática y profesional.
-2. Si un cliente solicita una devolución y FALTAN DATOS indispensables (como el número de pedido ECO-XXXXX o si el producto fue abierto/usado), NO ejecutes herramientas a ciegas: pídele amablemente los datos faltantes.
-3. Si un producto es de higiene/cuidado personal y fue ABIERTO o USADO, rechaza amablemente la devolución citando la Sección 3 de la política sanitaria, y ofrece recomendaciones ecológicas de aprovechamiento del manual.
-4. Para daños en transporte, aclara que requiere escalamiento a agente humano con fotos dentro de las primeras 48h.
-5. Si te piden operaciones fuera de tu alcance (ej. cancelar pagos bancarios directos o transacciones sin devolución), explica con transparencia que no tienes permisos transaccionales directos.
-6. Cita siempre al final las FUENTES oficiales utilizadas.
+2. Mantén continuidad con los turnos previos de la conversación. Si el cliente responde a una pregunta que tú le hiciste antes (por ejemplo, proporcionando su número de pedido o confirmando el estado del empaque), integra esa información inmediatamente con el contexto previo.
+3. Si un cliente solicita una devolución y FALTAN DATOS indispensables (como el número de pedido ECO-XXXXX o si el producto fue abierto/usado), NO ejecutes herramientas a ciegas: pídele amablemente los datos faltantes.
+4. Si un producto es de higiene/cuidado personal y fue ABIERTO o USADO, rechaza amablemente la devolución citando la Sección 3 de la política sanitaria, y ofrece recomendaciones ecológicas de aprovechamiento del manual.
+5. Para daños en transporte, aclara que requiere escalamiento a agente humano con fotos dentro de las primeras 48h.
+6. Si te piden operaciones fuera de tu alcance (ej. cancelar pagos bancarios directos o transacciones sin devolución), explica con transparencia que no tienes permisos transaccionales directos.
+7. Cita siempre al final las FUENTES oficiales utilizadas.
 """
 
 @st.cache_resource
@@ -91,29 +99,47 @@ def compilar_agente(api_key: str):
 
     def planificador(state: AgentState):
         consulta = state["consulta"]
-        prompt = f"""Analiza la consulta del cliente y decide el plan de herramientas MCP:
-Herramientas:
+        historial = state.get("historial", [])
+
+        historial_str = ""
+        if historial:
+            lineas = []
+            for m in historial[-6:]:
+                rol = "Cliente" if m.get("role") == "user" else "EcoBot"
+                lineas.append(f"{rol}: {m.get('content', '')}")
+            historial_str = "HISTORIAL CONVERSACIONAL PREVIO:\n" + "\n".join(lineas) + "\n\n"
+
+        prompt = f"""Analiza la consulta del cliente y decide el plan de herramientas MCP.
+Ten en cuenta el historial de la conversación para entender el contexto (por ejemplo, si en turnos previos se solicitó devolver un producto y ahora el cliente entrega el código ECO-XXXXX o aclara si está sellado o usado).
+
+{historial_str}ÚLTIMA CONSULTA DEL CLIENTE:
+{consulta}
+
+Herramientas disponibles:
 - buscar_conocimiento(consulta): Consulta políticas, manuales y FAQs en ChromaDB.
-- consultar_pedido(codigo_pedido): Consulta órdenes en SQLite.
-- consultar_inventario(sku): Consulta catálogo en SQLite.
+- consultar_pedido(codigo_pedido): Consulta órdenes en SQLite por código ECO-XXXXX.
+- consultar_inventario(sku): Consulta catálogo en SQLite por SKU PROD-XXX.
 - verificar_elegibilidad_producto(codigo_pedido, sku_producto, motivo, producto_abierto_o_usado): Valida reglas de 30 días, empaque y excepciones sanitarias.
-- generar_etiqueta_devolucion(codigo_pedido, sku_producto, nombre_cliente, ciudad_recogida): Emite la guía de retorno.
+- generar_etiqueta_devolucion(codigo_pedido, sku_producto, nombre_cliente, ciudad_recogida): Emite la guía de retorno formal.
 
 REGLAS CRÍTICAS DE PLANIFICACIÓN:
-1. Para trámites de devolución, planifica ÚNICAMENTE 'verificar_elegibilidad_producto'. NO agregues 'generar_etiqueta_devolucion' de forma preventiva; el ejecutor la generará automáticamente SOLO si la elegibilidad resulta aprobada (es_elegible: true).
+1. Para trámites de devolución, planifica ÚNICAMENTE 'verificar_elegibilidad_producto'. El ejecutor generará la guía automáticamente SOLO si la elegibilidad resulta aprobada (es_elegible: true).
 2. Si un producto es de higiene/cuidado personal y fue abierto o usado, NUNCA debe generarse etiqueta.
 3. Si la consulta es puramente informativa, usa 'buscar_conocimiento'.
-4. Si faltan datos indispensables o la solicitud está fuera de alcance, responde {{"acciones": []}}.
+4. Si faltan datos indispensables y el cliente aún no los ha proporcionado en la conversación, responde {{"acciones": []}}.
+5. Si el cliente responde con datos faltantes (ej: código de pedido o estado del empaque) solicitados en turnos anteriores para una devolución, combínalos para llamar a 'verificar_elegibilidad_producto'.
 
-CONSULTA: {consulta}
-Responde ÚNICAMENTE JSON: {{"acciones": [{{"herramienta": "...", "parametros": {{...}}}}]}}"""
+Responde ÚNICAMENTE JSON:
+{{"acciones": [{{"herramienta": "nombre", "parametros": {{...}}}}]}}"""
+
         raw = invocar_llm([{"role": "user", "content": prompt}], api_key)
         try:
             acciones = leer_json(raw).get("acciones", [])
         except Exception:
             acciones = []
-            if "ECO-" in consulta.upper():
-                cod = re.search(r"ECO-\d{5}", consulta.upper()).group(0)
+            texto_completo = (consulta + " " + historial_str).upper()
+            if "ECO-" in texto_completo:
+                cod = re.search(r"ECO-\d{5}", texto_completo).group(0)
                 acciones.append({"herramienta": "consultar_pedido", "parametros": {"codigo_pedido": cod}})
             else:
                 acciones.append({"herramienta": "buscar_conocimiento", "parametros": {"consulta": consulta}})
@@ -175,10 +201,25 @@ Responde ÚNICAMENTE JSON: {{"acciones": [{{"herramienta": "...", "parametros": 
 
     def responder(state: AgentState):
         consulta = state["consulta"]
+        historial = state.get("historial", [])
         evidencias = state.get("evidencia", [])
         ctx = json.dumps(evidencias, ensure_ascii=False, indent=2) if evidencias else "NO SE EJECUTARON HERRAMIENTAS"
-        prompt = f"CONSULTA DEL CLIENTE:\n{consulta}\n\nEVIDENCIA MCP:\n{ctx}\n\nRedacta la respuesta final empática y fundamentada:"
-        resp = invocar_llm([{"role": "system", "content": SYSTEM_PROMPT}, {"role": "user", "content": prompt}], api_key)
+
+        mensajes_llm = [{"role": "system", "content": SYSTEM_PROMPT}]
+        for m in historial[-6:]:
+            if m.get("content"):
+                mensajes_llm.append({"role": m["role"], "content": m["content"]})
+
+        prompt_usuario = f"""CONSULTA ACTUAL DEL CLIENTE:
+{consulta}
+
+EVIDENCIA RECOPILADA DE HERRAMIENTAS MCP:
+{ctx}
+
+Redacta la respuesta final para el cliente aplicando todas las directrices de EcoBot y manteniendo continuidad natural con la conversación previa:"""
+
+        mensajes_llm.append({"role": "user", "content": prompt_usuario})
+        resp = invocar_llm(mensajes_llm, api_key)
         return {"respuesta": resp}
 
     workflow = StateGraph(AgentState)
@@ -207,6 +248,32 @@ with st.sidebar:
 
     st.divider()
 
+    # Controles de Sesión / Interacción
+    st.subheader("🎯 Control de Interacción")
+    col_btn1, col_btn2 = st.columns(2)
+    with col_btn1:
+        if st.button("🟢 Iniciar", use_container_width=True, help="Inicia una nueva sesión de atención"):
+            st.session_state.interaccion_activa = True
+            st.session_state.messages = [
+                {
+                    "role": "assistant",
+                    "content": "¡Hola! Soy **EcoBot** 🌱, el asistente de atención al cliente de **EcoMarket**.\n\nPuedo orientarte sobre nuestras políticas de sostenibilidad, consultar el estado de tus compras o gestionar la **devolución de tus pedidos** de manera automática. ¿En qué te puedo colaborar hoy?"
+                }
+            ]
+            st.rerun()
+
+    with col_btn2:
+        if st.button("🛑 Finalizar", use_container_width=True, help="Concluye la interacción actual y cierra la sesión"):
+            if st.session_state.get("interaccion_activa", True):
+                st.session_state.interaccion_activa = False
+                st.session_state.messages.append({
+                    "role": "assistant",
+                    "content": "🌿 **Interacción finalizada.**\n\n¡Muchas gracias por comunicarte con el Centro de Atención Inteligente de **EcoMarket**! 🌱\n\nSi tramitaste una devolución, recuerda conservar la copia de la guía firmada por la transportadora. Tu solicitud ha quedado registrada en nuestro sistema.\n\nPara realizar una nueva consulta o iniciar otro trámite, pulsa el botón **🟢 Iniciar** en la barra lateral."
+                })
+                st.rerun()
+
+    st.divider()
+
     st.subheader("💡 Consultas de Prueba")
     tab_tf, tab_t2 = st.tabs(["🚀 Taller Final", "📜 Taller 2"])
 
@@ -222,6 +289,7 @@ with st.sidebar:
         ]
         for etiqueta, prompt in casos_tf:
             if st.button(etiqueta, key=f"btn_tf_{etiqueta[:10]}", use_container_width=True):
+                st.session_state.interaccion_activa = True
                 st.session_state.prompt_elegido = prompt
 
     with tab_t2:
@@ -236,6 +304,7 @@ with st.sidebar:
         ]
         for etiqueta, prompt in casos_t2:
             if st.button(etiqueta, key=f"btn_t2_{etiqueta[:10]}", use_container_width=True):
+                st.session_state.interaccion_activa = True
                 st.session_state.prompt_elegido = prompt
 
     st.divider()
@@ -254,8 +323,9 @@ with st.sidebar:
     except Exception as e:
         st.warning("Base de datos no inicializada.")
 
-    if st.button("🗑️ Limpiar Historial de Chat"):
+    if st.button("🗑️ Limpiar Historial de Chat", use_container_width=True):
         st.session_state.messages = []
+        st.session_state.interaccion_activa = True
         st.rerun()
 
 
@@ -269,7 +339,10 @@ if not OLLAMA_API_KEY:
     st.warning("⚠️ Por favor ingresa tu `OLLAMA_API_KEY` en la barra lateral para interactuar con EcoBot.")
     st.stop()
 
-# Inicializar historial de mensajes
+# Inicializar estado de sesión
+if "interaccion_activa" not in st.session_state:
+    st.session_state.interaccion_activa = True
+
 if "messages" not in st.session_state:
     st.session_state.messages = [
         {
@@ -286,13 +359,17 @@ for msg in st.session_state.messages:
             with st.expander("🛠️ Herramientas MCP ejecutadas"):
                 st.json(msg["evidencias"])
 
-# Capturar nuevo prompt (por input o por botón de la barra lateral)
+# Capturar nuevo prompt
 prompt_actual = None
 if "prompt_elegido" in st.session_state and st.session_state.prompt_elegido:
     prompt_actual = st.session_state.prompt_elegido
     st.session_state.prompt_elegido = None
 else:
-    prompt_actual = st.chat_input("Escribe tu consulta o solicitud de devolución...")
+    if st.session_state.interaccion_activa:
+        prompt_actual = st.chat_input("Escribe tu consulta o solicitud de devolución...")
+    else:
+        st.info("ℹ️ La interacción ha sido finalizada. Pulsa **🟢 Iniciar** en la barra lateral para abrir una nueva conversación.")
+        st.chat_input("Interacción finalizada. Pulsa 'Iniciar' para continuar...", disabled=True)
 
 if prompt_actual:
     st.session_state.messages.append({"role": "user", "content": prompt_actual})
@@ -304,7 +381,18 @@ if prompt_actual:
             try:
                 agente = compilar_agente(OLLAMA_API_KEY)
                 t0 = time.time()
-                resultado = agente.invoke({"consulta": prompt_actual})
+
+                # Pasar historial previo excluyendo el último mensaje
+                historial_previo = [
+                    {"role": m["role"], "content": m["content"]}
+                    for m in st.session_state.messages[:-1]
+                    if m.get("content")
+                ]
+
+                resultado = agente.invoke({
+                    "consulta": prompt_actual,
+                    "historial": historial_previo
+                })
                 t1 = time.time()
 
                 respuesta_texto = resultado.get("respuesta", "Sin respuesta.")

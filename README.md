@@ -21,7 +21,8 @@ Este repositorio contiene la implementación integral del **Proyecto Final**, en
 2. **Consultar de forma determinista el estado de pedidos e inventario** en una base de datos relacional SQLite (`ecomarket.db`).
 3. **Validar la elegibilidad legal y sanitaria de devoluciones** según la **Ley 1480 del Estatuto del Consumidor (retracto de 30 días)** y la **Sección 3 de la Política Sanitaria** (bloqueo preventivo de productos de higiene destapados/usados).
 4. **Emitir radicados formales (`RET-2026-XXXX`) y generar guías de retorno logístico** integrando trazabilidad transaccional en SQLite.
-5. **Desplegar una interfaz conversacional interactiva en Streamlit**, accesible públicamente mediante túneles seguros de Cloudflare.
+5. **Mantener memoria conversacional multi-turno en LangGraph**, guiando al usuario en solicitudes incompletas y recordando el contexto entre turnos de diálogo.
+6. **Gestionar el ciclo de vida de la interacción** con botones de apertura (`🟢 Iniciar`) y cierre formal de sesión (`🛑 Finalizar`), desplegado en una interfaz web con Streamlit y Cloudflare Tunnel.
 
 ---
 
