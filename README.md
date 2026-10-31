@@ -11,6 +11,8 @@
 **Bases de Datos:** SQLite (`ecomarket.db`) y ChromaDB (`ecomarket_kb`)  
 **Despliegue Web:** Streamlit + Cloudflare Tunnel (`cloudflared`)  
 
+**Video EcoMarket:** https://icesiedu-my.sharepoint.com/:f:/g/personal/1061740187_u_icesi_edu_co/IgCiKiiqLN__RprurB19bQbSAfGjs0JDNastEjrOx70XT9Y?e=dyeNOx
+
 ---
 
 ## 📌 Descripción del Proyecto
