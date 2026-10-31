@@ -6,19 +6,6 @@
 
 ---
 
-## Estado del Proyecto y Metodología de Trabajo
-
-El desarrollo de este proyecto se estructura en cuatro fases secuenciales e iterativas:
-
-| Fase | Descripción | Estado |
-| :---: | :--- | :---: |
-| **Fase 1** | Diseño de la Arquitectura del Agente, Integración MCP, SQLite y Definición de Herramientas | **Aprobada** |
-| **Fase 2** | Implementación, Conexión de Componentes, Servidores FastMCP y Evaluación de Prompts | **Completada y Verificada en Colab** |
-| **Fase 3** | Análisis Crítico, Seguridad, Ética y Monitoreo | **Completada** |
-| **Fase 4** | Despliegue de la Aplicación Web (Streamlit/Cloudflare) y Guion de Video | **Completada** |
-
----
-
 ## Fase 1: Diseño de la Arquitectura del Agente
 
 ### 1. Extensión de la Arquitectura RAG: Del Asistente Pasivo al Agente Autónomo
